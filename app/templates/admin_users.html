@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Manage Users{% endblock %}
+{% block content %}
+<div class="page-title">User Management</div>
+<div class="page-sub">View and manage all registered users and their roles.</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Joined</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td style="font-family:'DM Mono',monospace;color:var(--muted);font-size:0.8rem">{{ user.id }}</td>
+        <td style="font-weight:600">{{ user.username }}</td>
+        <td style="color:var(--muted);font-size:0.85rem">{{ user.email }}</td>
+        <td>
+          <span class="badge {{ 'income' if user.role == 'admin' else ('expense' if user.role == 'viewer' else '') }}"
+            style="{{ 'background:rgba(123,97,255,0.12);color:#7b61ff' if user.role == 'analyst' }}">
+            {{ user.role }}
+          </span>
+        </td>
+        <td style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--muted)">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+        <td>
+          {% if user.id != current_user.id %}
+          <form method="POST" action="{{ url_for('admin.change_role', user_id=user.id) }}" style="display:inline;gap:8px">
+            <select name="role" style="padding:5px 8px;font-size:0.78rem;width:auto">
+              <option value="viewer" {{ 'selected' if user.role == 'viewer' }}>Viewer</option>
+              <option value="analyst" {{ 'selected' if user.role == 'analyst' }}>Analyst</option>
+              <option value="admin" {{ 'selected' if user.role == 'admin' }}>Admin</option>
+            </select>
+            <button type="submit" class="btn btn-sm btn-edit" style="margin-left:6px">Update</button>
+          </form>
+          <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}" style="display:inline;margin-left:6px" onsubmit="return confirm('Delete user {{ user.username }}?')">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+          {% else %}
+          <span style="color:var(--muted);font-size:0.8rem">— (you)</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

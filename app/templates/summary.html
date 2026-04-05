@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+{% block content %}
+<div class="page-title">Financial Analytics</div>
+<div class="page-sub">Summary and insights for your financial records.</div>
+
+<!-- Stat Cards -->
+<div class="grid-3">
+  <div class="stat-card">
+    <div class="stat-label">Total Income</div>
+    <div class="stat-value green">₹{{ "%.2f"|format(data.total_income) }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Total Expenses</div>
+    <div class="stat-value red">₹{{ "%.2f"|format(data.total_expenses) }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Net Balance</div>
+    <div class="stat-value {{ 'green' if data.balance >= 0 else 'red' }}">
+      ₹{{ "%.2f"|format(data.balance) }}
+    </div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+
+  <!-- Category Breakdown -->
+  <div class="card">
+    <h3 style="font-size:0.9rem;color:var(--muted);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.06em">Category Breakdown</h3>
+    {% if data.category_breakdown %}
+    <table>
+      <thead>
+        <tr><th>Type : Category</th><th>Total</th></tr>
+      </thead>
+      <tbody>
+        {% for key, amount in data.category_breakdown.items() %}
+        {% set parts = key.split(':') %}
+        <tr>
+          <td>
+            <span class="badge {{ parts[0] }}">{{ parts[0] }}</span>
+            <span style="margin-left:8px">{{ parts[1] }}</span>
+          </td>
+          <td style="font-family:'DM Mono',monospace;color:{{ '#00e5b4' if parts[0] == 'income' else '#ff5a5a' }}">
+            ₹{{ "%.2f"|format(amount) }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="color:var(--muted)">No data available.</p>
+    {% endif %}
+  </div>
+
+  <!-- Monthly Totals -->
+  <div class="card">
+    <h3 style="font-size:0.9rem;color:var(--muted);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.06em">Monthly Totals</h3>
+    {% if data.monthly_totals %}
+    <table>
+      <thead>
+        <tr><th>Month</th><th>Income</th><th>Expense</th></tr>
+      </thead>
+      <tbody>
+        {% for month, vals in data.monthly_totals.items() %}
+        <tr>
+          <td style="font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--muted)">{{ month }}</td>
+          <td style="font-family:'DM Mono',monospace;color:#00e5b4">₹{{ "%.2f"|format(vals.income) }}</td>
+          <td style="font-family:'DM Mono',monospace;color:#ff5a5a">₹{{ "%.2f"|format(vals.expense) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="color:var(--muted)">No monthly data available.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="card">
+  <h3 style="font-size:0.9rem;color:var(--muted);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.06em">Recent Activity</h3>
+  {% if data.recent_activity %}
+  <table>
+    <thead>
+      <tr><th>Date</th><th>Category</th><th>Type</th><th>Amount</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      {% for t in data.recent_activity %}
+      <tr>
+        <td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">{{ t.date }}</td>
+        <td>{{ t.category }}</td>
+        <td><span class="badge {{ t.type }}">{{ t.type }}</span></td>
+        <td style="font-family:'DM Mono',monospace;color:{{ '#00e5b4' if t.type == 'income' else '#ff5a5a' }}">
+          ₹{{ "%.2f"|format(t.amount) }}
+        </td>
+        <td style="color:var(--muted);font-size:0.82rem">{{ t.notes or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--muted)">No recent activity.</p>
+  {% endif %}
+  <p style="margin-top:16px;font-size:0.8rem;color:var(--muted)">Total records: <strong style="color:var(--text)">{{ data.total_transactions }}</strong></p>
+</div>
+{% endblock %}

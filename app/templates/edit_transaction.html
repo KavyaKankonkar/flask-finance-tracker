@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Edit Transaction{% endblock %}
+{% block content %}
+<div class="page-title">Edit Transaction</div>
+<div class="page-sub">Update the details of this record.</div>
+
+<div class="card" style="max-width:560px">
+  <form method="POST">
+    <div class="form-group">
+      <label>Amount (₹)</label>
+      <input type="number" name="amount" value="{{ txn.amount }}" step="0.01" min="0.01" required />
+    </div>
+    <div class="form-group">
+      <label>Type</label>
+      <select name="type" required>
+        <option value="income" {{ 'selected' if txn.type == 'income' }}>Income</option>
+        <option value="expense" {{ 'selected' if txn.type == 'expense' }}>Expense</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <input type="text" name="category" value="{{ txn.category }}" required />
+    </div>
+    <div class="form-group">
+      <label>Date</label>
+      <input type="date" name="date" value="{{ txn.date }}" required />
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <textarea name="notes" rows="3">{{ txn.notes or '' }}</textarea>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:8px">
+      <button type="submit" class="btn btn-primary">Update Transaction</button>
+      <a href="{{ url_for('transactions.list_transactions') }}" class="btn" style="background:var(--border);color:var(--muted)">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

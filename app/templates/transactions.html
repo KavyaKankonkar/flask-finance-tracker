@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Transactions{% endblock %}
+{% block content %}
+<div class="page-title">Transactions</div>
+<div class="page-sub">
+  {% if current_user.role in ['analyst', 'admin'] %}
+  Filter and manage all financial records.
+  {% else %}
+  Viewing all financial records. Filtering available for Analyst/Admin roles.
+  {% endif %}
+</div>
+
+{% if current_user.role in ['analyst', 'admin'] %}
+<div class="card" style="margin-bottom:20px">
+  <form method="GET">
+    <div class="filter-row">
+      <div class="form-group">
+        <label>Type</label>
+        <select name="type">
+          <option value="">All Types</option>
+          <option value="income" {{ 'selected' if request.args.get('type') == 'income' }}>Income</option>
+          <option value="expense" {{ 'selected' if request.args.get('type') == 'expense' }}>Expense</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select name="category">
+          <option value="">All Categories</option>
+          {% for c in categories %}
+          <option value="{{ c }}" {{ 'selected' if request.args.get('category') == c }}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>From Date</label>
+        <input type="date" name="start_date" value="{{ request.args.get('start_date', '') }}"/>
+      </div>
+      <div class="form-group">
+        <label>To Date</label>
+        <input type="date" name="end_date" value="{{ request.args.get('end_date', '') }}"/>
+      </div>
+      <div class="form-group">
+        <label>&nbsp;</label>
+        <button type="submit" class="btn btn-primary">Filter</button>
+      </div>
+      <div class="form-group">
+        <label>&nbsp;</label>
+        <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-sm" style="background:var(--border);color:var(--muted);display:inline-block;padding:10px 16px">Reset</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <span style="color:var(--muted);font-size:0.85rem">{{ transactions|length }} record(s)</span>
+    {% if current_user.role in ['analyst', 'admin'] %}
+    <a href="{{ url_for('transactions.add_transaction') }}" class="btn btn-primary btn-sm">+ Add New</a>
+    {% endif %}
+  </div>
+
+  {% if transactions %}
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Category</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Notes</th>
+        {% if current_user.role in ['analyst', 'admin'] %}<th>Actions</th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in transactions %}
+      <tr>
+        <td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">{{ t.date }}</td>
+        <td>{{ t.category }}</td>
+        <td><span class="badge {{ t.type }}">{{ t.type }}</span></td>
+        <td style="font-family:'DM Mono',monospace;font-weight:600;color:{{ '#00e5b4' if t.type == 'income' else '#ff5a5a' }}">
+          {{ '+' if t.type == 'income' else '-' }}₹{{ "%.2f"|format(t.amount) }}
+        </td>
+        <td style="color:var(--muted);font-size:0.82rem">{{ t.notes or '—' }}</td>
+        {% if current_user.role in ['analyst', 'admin'] %}
+        <td>
+          <a href="{{ url_for('transactions.edit_transaction', txn_id=t.id) }}" class="btn btn-sm btn-edit">Edit</a>
+          {% if current_user.role == 'admin' %}
+          <form method="POST" action="{{ url_for('transactions.delete_transaction_route', txn_id=t.id) }}" style="display:inline" onsubmit="return confirm('Delete this transaction?')">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+          {% endif %}
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--muted);text-align:center;padding:30px 0">No transactions found.</p>
+  {% endif %}
+</div>
+{% endblock %}

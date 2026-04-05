@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Add Transaction{% endblock %}
+{% block content %}
+<div class="page-title">Add Transaction</div>
+<div class="page-sub">Create a new income or expense record.</div>
+
+<div class="card" style="max-width:560px">
+  <form method="POST">
+    <div class="form-group">
+      <label>Amount (₹)</label>
+      <input type="number" name="amount" placeholder="e.g. 5000" step="0.01" min="0.01" required />
+    </div>
+    <div class="form-group">
+      <label>Type</label>
+      <select name="type" required>
+        <option value="">Select type</option>
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <input type="text" name="category" placeholder="e.g. Salary, Rent, Groceries" required />
+    </div>
+    <div class="form-group">
+      <label>Date</label>
+      <input type="date" name="date" required />
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <textarea name="notes" rows="3" placeholder="Any additional details..."></textarea>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:8px">
+      <button type="submit" class="btn btn-primary">Save Transaction</button>
+      <a href="{{ url_for('transactions.list_transactions') }}" class="btn" style="background:var(--border);color:var(--muted)">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

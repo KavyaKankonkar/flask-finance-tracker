@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-title">Welcome back, {{ current_user.username }} 👋</div>
+<div class="page-sub">Here's a quick overview of recent activity.</div>
+
+<div class="card">
+  <h3 style="margin-bottom:16px;font-size:1rem;color:var(--muted);font-weight:500">Recent Transactions</h3>
+  {% if transactions %}
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Category</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in transactions %}
+      <tr>
+        <td style="font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--muted)">{{ t.date }}</td>
+        <td>{{ t.category }}</td>
+        <td><span class="badge {{ t.type }}">{{ t.type }}</span></td>
+        <td style="font-family:'DM Mono',monospace;font-weight:600;color:{{ '#00e5b4' if t.type == 'income' else '#ff5a5a' }}">
+          {{ '+' if t.type == 'income' else '-' }}₹{{ "%.2f"|format(t.amount) }}
+        </td>
+        <td style="color:var(--muted);font-size:0.82rem">{{ t.notes or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--muted);text-align:center;padding:30px 0">No transactions yet.</p>
+  {% endif %}
+  <div style="margin-top:16px">
+    <a href="{{ url_for('transactions.list_transactions') }}" class="btn btn-sm btn-edit">View All →</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block auth %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">FinTrack</div>
+    <div class="auth-subtitle">Create a new account</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="Choose a username" required />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="Your email address" required />
+      </div>
+      <div class="form-group">
+        <label>Password (min 6 characters)</label>
+        <input type="password" name="password" placeholder="Create a password" required />
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px">Create Account</button>
+    </form>
+    <p style="margin-top:20px;color:var(--muted);font-size:0.8rem">
+      Already registered? <a href="{{ url_for('auth.login') }}" class="auth-link">Sign in</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
+

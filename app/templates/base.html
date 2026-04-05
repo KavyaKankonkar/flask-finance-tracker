@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FinTrack – {% block title %}{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --surface: #13161e;
+      --border: #1f2330;
+      --accent: #00e5b4;
+      --accent2: #7b61ff;
+      --red: #ff5a5a;
+      --green: #00e5b4;
+      --text: #e8eaf0;
+      --muted: #6b7280;
+      --card: #171a24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; min-height: 100vh; display: flex; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px; min-height: 100vh; background: var(--surface);
+      border-right: 1px solid var(--border); padding: 28px 0; display: flex;
+      flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0;
+    }
+    .sidebar .logo {
+      font-size: 1.2rem; font-weight: 700; color: var(--accent);
+      padding: 0 24px 28px; letter-spacing: -0.5px; border-bottom: 1px solid var(--border);
+    }
+    .sidebar .logo span { color: var(--text); }
+    .nav { margin-top: 20px; flex: 1; }
+    .nav a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 24px; color: var(--muted); text-decoration: none;
+      font-size: 0.875rem; transition: all 0.15s; border-left: 3px solid transparent;
+    }
+    .nav a:hover, .nav a.active {
+      color: var(--text); background: rgba(0,229,180,0.06);
+      border-left-color: var(--accent);
+    }
+    .nav .icon { font-size: 1rem; width: 18px; text-align: center; }
+    .sidebar-footer { padding: 16px 24px; border-top: 1px solid var(--border); }
+    .role-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(123,97,255,0.15); color: var(--accent2); margin-bottom: 10px;
+    }
+    .sidebar-user { font-size: 0.8rem; color: var(--muted); margin-bottom: 10px; }
+    .btn-logout {
+      display: block; width: 100%; padding: 8px; background: rgba(255,90,90,0.1);
+      color: var(--red); border: 1px solid rgba(255,90,90,0.2); border-radius: 6px;
+      text-align: center; text-decoration: none; font-size: 0.8rem; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-logout:hover { background: rgba(255,90,90,0.2); }
+
+    /* Main */
+    .main { margin-left: 220px; flex: 1; padding: 36px 40px; }
+    .page-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
+    .page-sub { color: var(--muted); font-size: 0.875rem; margin-bottom: 28px; }
+
+    /* Cards */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px;
+    }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; }
+    .stat-label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .stat-value { font-size: 1.8rem; font-weight: 700; font-family: 'DM Mono', monospace; }
+    .stat-value.green { color: var(--green); }
+    .stat-value.red { color: var(--red); }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; }
+    th { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+    td { padding: 12px 14px; font-size: 0.875rem; border-bottom: 1px solid rgba(31,35,48,0.7); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Badges */
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+    .badge.income { background: rgba(0,229,180,0.12); color: var(--green); }
+    .badge.expense { background: rgba(255,90,90,0.12); color: var(--red); }
+
+    /* Forms */
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%; padding: 10px 14px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+      font-family: 'Sora', sans-serif; font-size: 0.875rem; outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    .btn {
+      padding: 10px 22px; border-radius: 8px; font-size: 0.875rem;
+      font-family: 'Sora', sans-serif; font-weight: 600; cursor: pointer;
+      border: none; transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: var(--accent); color: #0d0f14; }
+    .btn-danger { background: rgba(255,90,90,0.15); color: var(--red); border: 1px solid rgba(255,90,90,0.3); }
+    .btn-sm { padding: 5px 12px; font-size: 0.78rem; }
+    .btn-edit { background: rgba(123,97,255,0.12); color: var(--accent2); border: 1px solid rgba(123,97,255,0.25); }
+
+    /* Alerts */
+    .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 18px; font-size: 0.875rem; }
+    .alert-error { background: rgba(255,90,90,0.1); border: 1px solid rgba(255,90,90,0.25); color: var(--red); }
+    .alert-success { background: rgba(0,229,180,0.1); border: 1px solid rgba(0,229,180,0.25); color: var(--green); }
+
+    /* Filter row */
+    .filter-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-row .form-group { margin-bottom: 0; min-width: 160px; }
+
+    /* Auth pages */
+    .auth-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; width: 100%; background: var(--bg); }
+    .auth-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; }
+    .auth-logo { font-size: 1.4rem; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+    .auth-subtitle { color: var(--muted); font-size: 0.875rem; margin-bottom: 28px; }
+    .auth-link { color: var(--accent); text-decoration: none; font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+{% if current_user.is_authenticated %}
+<nav class="sidebar">
+  <div class="logo">Fin<span>Track</span></div>
+  <div class="nav">
+    <a href="{{ url_for('transactions.dashboard') }}" class="{{ 'active' if request.endpoint == 'transactions.dashboard' }}">
+      <span class="icon">⬡</span> Dashboard
+    </a>
+    <a href="{{ url_for('transactions.list_transactions') }}" class="{{ 'active' if request.endpoint == 'transactions.list_transactions' }}">
+      <span class="icon">≡</span> Transactions
+    </a>
+    {% if current_user.role in ['analyst', 'admin'] %}
+    <a href="{{ url_for('transactions.add_transaction') }}" class="{{ 'active' if request.endpoint == 'transactions.add_transaction' }}">
+      <span class="icon">+</span> Add Record
+    </a>
+    <a href="{{ url_for('summary.summary') }}" class="{{ 'active' if request.endpoint == 'summary.summary' }}">
+      <span class="icon">◎</span> Analytics
+    </a>
+    {% endif %}
+    {% if current_user.role == 'admin' %}
+    <a href="{{ url_for('admin.manage_users') }}" class="{{ 'active' if request.endpoint == 'admin.manage_users' }}">
+      <span class="icon">⊹</span> Users
+    </a>
+    {% endif %}
+  </div>
+  <div class="sidebar-footer">
+    <div class="role-badge">{{ current_user.role }}</div>
+    <div class="sidebar-user">{{ current_user.username }}</div>
+    <a href="{{ url_for('auth.logout') }}" class="btn-logout">Sign Out</a>
+  </div>
+</nav>
+<div class="main">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</div>
+{% else %}
+{% block auth %}{% endblock %}
+{% endif %}
+</body>
+</html>
